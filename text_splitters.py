@@ -4,7 +4,10 @@ Optimizing document chunks for RAG
 """
 
 from dotenv import load_dotenv
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import (
+    MarkdownHeaderTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
 
 load_dotenv()
 
@@ -27,26 +30,78 @@ language model understand the context of retrieved information.
 """
 
 
+SAMPLE_MARKDOWN = """
+# Introduction to RAG
+
+Retrieval-Augmented Generation combines retrieval with generation.
+
+## What is RAG?
+
+RAG allows LLMs to retrieve relevant information from external documents.
+
+## How RAG Works
+
+### Document Loading
+
+Load documents from different sources.
+
+### Text Chunking
+
+Split large documents into smaller chunks.
+
+### Embeddings
+
+Convert chunks into vector representations.
+
+# Conclusion
+
+RAG helps LLMs generate answers using external knowledge.
+"""
+
+
 def recursive_splitter():
-    # Initialize the recursive text splitter
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=200,
-        chunk_overlap=30,
+        chunk_size=500,
+        chunk_overlap=50,
         length_function=len,
         separators=["\n\n", "\n", " ", ""],
     )
 
-    # Split the text into smaller chunks
     chunks = text_splitter.split_text(SAMPLE_TEXT)
 
-    # Display the generated chunks
     print(f"Total Chunks: {len(chunks)}")
 
-    for index, chunk in enumerate(chunks, start=1):
-        print(f"\n--- Chunk {index} ---")
+    for i, chunk in enumerate(chunks, start=1):
+        print(f"\n--- Chunk {i} ---")
         print(chunk)
         print(f"Chunk Length: {len(chunk)}")
 
 
+def markdown_splitter():
+    headers_to_split_on = [
+        ("#", "Header 1"),
+        ("##", "Header 2"),
+        ("###", "Header 3"),
+    ]
+
+    markdown_splitter = MarkdownHeaderTextSplitter(
+        headers_to_split_on=headers_to_split_on,
+        strip_headers=False,
+    )
+
+    chunks = markdown_splitter.split_text(SAMPLE_MARKDOWN)
+
+    print(f"\nTotal Markdown Chunks: {len(chunks)}")
+
+    for i, chunk in enumerate(chunks, start=1):
+        print(f"\n--- Chunk {i} ---")
+        print(chunk.page_content)
+        print(f"Metadata: {chunk.metadata}")
+
+
 if __name__ == "__main__":
+    print("\n========== RECURSIVE SPLITTER ==========")
     recursive_splitter()
+
+    print("\n========== MARKDOWN SPLITTER ==========")
+    markdown_splitter()
