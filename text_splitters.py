@@ -99,9 +99,33 @@ def markdown_splitter():
         print(f"Metadata: {chunk.metadata}")
 
 
+def overlap_importance():
+    text = "The quick brown fox jumps over the lazy dogs." * 10
+
+    # no overlap
+    no_overlap = RecursiveCharacterTextSplitter(chunk_size=50, chunk_overlap=0)
+
+    # with overlap
+    with_overlap = RecursiveCharacterTextSplitter(chunk_size=50, chunk_overlap=20)
+
+    chunk_no_overlap = no_overlap.split_text(text)
+    chunk_with_overlap = with_overlap.split_text(text)
+
+    print("Without overlap")
+    print(f"Chunk 1 end : ...{chunk_no_overlap[0][-20:]}")
+    print(f"Chunk 2 start : {chunk_no_overlap[1][:20]}...")
+
+    print("With overlap")
+    print(f"Chunk 1 end : ...{chunk_with_overlap[0][-20:]}")
+    print(f"Chunk 2 start : {chunk_with_overlap[1][:20]}...")
+
+
 if __name__ == "__main__":
     print("\n========== RECURSIVE SPLITTER ==========")
     recursive_splitter()
 
     print("\n========== MARKDOWN SPLITTER ==========")
     markdown_splitter()
+
+    print("\n========== OVERLAP IMPORTANCE ==========")
+    overlap_importance()
