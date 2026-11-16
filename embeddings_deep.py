@@ -18,5 +18,17 @@ def basic_embedding():
     print(f"Vector norm : {np.linalg.norm(single_embedding):.4f}")
 
 
+def batch_embeddings():
+    text = ["What is LangChain?", "What is Rag", "How does a neural network work?"]
+
+    batch_embedding = embeddings.embed_documents(text)
+
+    for i, emb in enumerate(batch_embedding):
+        print(f"Text {i + 1} Vector dimensions : {len(emb)}")
+        print(f"Text {i + 1} First 5 values : {emb[:5]}")
+        print(f"Text {i + 1} Vector norm : {np.linalg.norm(emb):.4f}")
+
+
 if __name__ == "__main__":
     basic_embedding()
+    batch_embeddings()
