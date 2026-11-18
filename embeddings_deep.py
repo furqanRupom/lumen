@@ -73,32 +73,51 @@ def batch_embeddings():
         print(f"Vector norm: {np.linalg.norm(vector):.4f}")
 
 
-def cosine_similarity():
+def similarity_search():
     """
-    Calculate cosine similarity between two text embeddings.
+    Perform semantic similarity search using cosine similarity.
 
-    Cosine similarity measures the angle between two vectors.
-
-    A value closer to 1 means greater directional similarity.
-    A value around 0 means little directional similarity.
-    A value closer to -1 means opposite directions.
-
-    This is commonly used in RAG for semantic similarity search.
+    Steps:
+        1. Convert the query into an embedding.
+        2. Convert documents into embeddings.
+        3. Calculate cosine similarity between query and documents.
+        4. Rank documents by similarity score.
+        5. Display the most relevant documents first.
     """
-    text1 = "What is LangChain?"
-    text2 = "Explain LangChain framework."
 
-    vector1 = np.array(embeddings.embed_query(text1))
-    vector2 = np.array(embeddings.embed_query(text2))
+    query = "What is LangChain?"
 
-    similarity = np.dot(vector1, vector2) / (
-        np.linalg.norm(vector1) * np.linalg.norm(vector2)
-    )
+    docs = [
+        "LangChain is a framework for building applications powered by LLMs.",
+        "Python is a popular programming language.",
+        "RAG stands for Retrieval-Augmented Generation.",
+        "LangChain helps developers build AI applications.",
+        "Neural networks are inspired by the human brain.",
+    ]
 
-    print("\n--- Cosine Similarity ---")
-    print(f"Text 1: {text1}")
-    print(f"Text 2: {text2}")
-    print(f"Similarity: {similarity:.4f}")
+    # generate embeddings
+    query_vector = np.array(embeddings.embed_query(query))
+    doc_vectors = embeddings.embed_documents(docs)
+
+    # compute cosine similarities
+    def cosine_similarity(vec1, vec2):
+        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
+    similarities = [
+        cosine_similarity(query_vector, np.array(doc_vec)) for doc_vec in doc_vectors
+    ]
+
+    # rank documents by similarity
+    ranked_docs = sorted(zip(docs, similarities), key=lambda x: x[1], reverse=True)
+
+    # display ranked documents
+    print("\n--- Similarity Search ---")
+    print(f"Query: {query}\n")
+
+    for doc, score in ranked_docs:
+        print(f"Document: {doc}")
+        print(f"Similarity score: {score:.4f}")
+        print()
 
 
 def euclidean_distance():
@@ -152,6 +171,6 @@ if __name__ == "__main__":
     """
     basic_embedding()
     batch_embeddings()
-    cosine_similarity()
+    similarity_search()
     euclidean_distance()
     dot_product()
